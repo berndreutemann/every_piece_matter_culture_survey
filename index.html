@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<!--
+  Werte-Check nach dem Workshop — Teilnehmerversion RAVENSBURGER (United Pieces)
+  MindnessConsult · Leichte Selbstreflexions-Variante, angelehnt an die BAM-Struktur
+  Kein Assessment, keine Skala, keine Berechnung, keine Übermittlung an Dritte.
+  Companion-Tool zur ausführlichen BAM-Erhebung (35 Fragen) — gleiche Optik, reduzierte Logik:
+  🟢/🟡/⚪ Selbsteinschätzung statt 1–5-Skala, keine Ampel-Formel, keine Reverse-Items.
+  Läuft vollständig im Browser, kein Server, Ergebnis wird als Datei heruntergeladen.
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werte-Check — Teilnehmerversion — United Pieces — MindnessConsult</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F4F1E9; --navy:#111F3D; --teal:#146873;
+    --green:#2E7D46; --amber:#C08A16; --stone:#8A8677;
+    --ink:#1A1A1A; --hair:#C9C3B4; --off-dim:#D8D2C0;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ background:#DCD8CC; font-family:'Inter',sans-serif; display:flex; justify-content:center; padding:32px 12px; color:var(--ink); }
+  .page{ width:100%; max-width:900px; background:var(--cream); padding:44px 44px 38px; box-shadow:0 20px 60px rgba(0,0,0,0.25); }
+  .eyebrow{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.26em; font-size:12px; color:var(--navy); border-bottom:2px solid var(--navy); padding-bottom:12px; margin-bottom:18px; }
+  h1{ font-family:'Anton',sans-serif; font-weight:400; text-transform:uppercase; font-size:36px; line-height:1.05; color:var(--navy); }
+  h2.section-h{ font-family:'Anton',sans-serif; font-weight:400; text-transform:uppercase; font-size:22px; color:var(--navy); margin-top:4px; }
+  .intro{ margin-top:14px; font-size:13.5px; line-height:1.65; color:#333; max-width:680px; }
+  .intro p + p{ margin-top:10px; }
+
+  .card{ background:#fff; border:2px solid var(--navy); padding:22px 24px; margin-top:24px; }
+
+  .progress-wrap{ margin-top:20px; }
+  .progress-track{ height:6px; background:var(--off-dim); border-radius:3px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--teal); transition:width .2s; }
+  .progress-lbl{ font-size:11.5px; color:#666; margin-top:6px; font-family:'Barlow Condensed',sans-serif; font-weight:600; letter-spacing:0.03em; text-transform:uppercase; }
+
+  .value-quote{ font-size:14px; line-height:1.6; color:var(--navy); font-style:italic; border-left:4px solid var(--teal); padding-left:14px; margin-top:2px; }
+  .value-anchor{ font-size:12.5px; line-height:1.55; color:#555; margin-top:8px; }
+  .value-anchor b{ color:var(--navy); }
+
+  .field-group{ margin-top:24px; padding-top:18px; border-top:1.5px solid var(--hair); }
+  .field-group:first-of-type{ border-top:none; margin-top:22px; padding-top:0; }
+  .field-label{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; font-size:11.5px; color:var(--teal); }
+  .field-question{ font-size:14px; line-height:1.5; margin-top:6px; color:var(--ink); }
+
+  .tri-row{ display:flex; gap:8px; margin-top:12px; }
+  .tri-btn{ flex:1; text-align:center; padding:10px 6px; border:1.6px solid var(--navy); background:#fff; cursor:pointer; }
+  .tri-btn .tb-ico{ font-size:17px; line-height:1; }
+  .tri-btn .tb-txt{ font-family:'Barlow Condensed',sans-serif; font-weight:600; font-size:9.5px; text-transform:uppercase; letter-spacing:0.02em; color:#666; margin-top:4px; display:block; }
+  .tri-btn.sel-green{ background:var(--green); border-color:var(--green); }
+  .tri-btn.sel-green .tb-txt{ color:#fff; }
+  .tri-btn.sel-amber{ background:var(--amber); border-color:var(--amber); }
+  .tri-btn.sel-amber .tb-txt{ color:#fff; }
+  .tri-btn.sel-white{ background:var(--stone); border-color:var(--stone); }
+  .tri-btn.sel-white .tb-txt{ color:#fff; }
+
+  .stolz-box{ margin-top:22px; padding-top:18px; border-top:1.5px solid var(--hair); }
+  .stolz-label{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; font-size:11.5px; color:var(--navy); }
+  .stolz-sub{ font-size:11.5px; color:#777; margin-top:3px; }
+  textarea.tarea{ width:100%; margin-top:9px; padding:10px 11px; border:1.6px solid var(--navy); font-family:'Inter',sans-serif; font-size:13px; resize:vertical; min-height:56px; background:#fff; }
+  input.tinput{ width:100%; margin-top:9px; padding:9px 10px; border:1.6px solid var(--navy); font-family:'Inter',sans-serif; font-size:13px; background:#fff; }
+
+  .tag{ display:inline-block; font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:9.5px; letter-spacing:0.03em; text-transform:uppercase; color:var(--teal); background:#E7F1F1; border:1px solid var(--teal); padding:2px 7px; border-radius:2px; margin:2px 4px 2px 0; }
+
+  .regel-item{ margin-top:20px; padding-top:16px; border-top:1.5px solid var(--hair); }
+  .regel-item:first-of-type{ border-top:none; margin-top:16px; padding-top:0; }
+  .regel-text{ font-size:13.5px; line-height:1.5; color:var(--ink); }
+  .regel-tags{ margin-top:6px; }
+
+  .sprache-item{ margin-top:18px; padding-top:16px; border-top:1.5px solid var(--hair); }
+  .sprache-item:first-of-type{ border-top:none; margin-top:14px; padding-top:0; }
+  .sprache-head{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+  .sprache-begriff{ font-family:'Anton',sans-serif; font-size:16px; text-transform:uppercase; color:var(--navy); }
+  .sprache-bedeutung{ font-size:12.5px; color:#555; }
+  .tri-row.tri-row-3{ }
+  .tri-btn .tb-txt.small3{ font-size:9px; }
+
+  .nav-row{ display:flex; justify-content:space-between; margin-top:26px; gap:10px; }
+  .nav-btn{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:13.5px; padding:10px 18px; border:2px solid var(--navy); background:#fff; color:var(--navy); cursor:pointer; text-transform:uppercase; }
+  .nav-btn.primary{ background:var(--navy); color:var(--cream); }
+  .nav-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+
+  .team-input{ margin-top:14px; }
+  .team-input label{ font-size:12px; font-weight:600; color:var(--navy); display:block; margin-bottom:5px; }
+  .team-input input{ width:100%; max-width:320px; padding:9px 10px; border:1.6px solid var(--navy); font-family:'Inter',sans-serif; font-size:13px; }
+
+  .thanks{ text-align:center; padding:30px 10px; }
+  .thanks h2{ font-family:'Anton',sans-serif; text-transform:uppercase; font-size:26px; color:var(--green); }
+  .thanks p{ margin-top:10px; font-size:13.5px; color:#444; }
+
+  .banner{ margin-top:14px; padding:10px 13px; font-size:12.5px; border-radius:2px; }
+  .banner.err{ background:#f6dede; color:#7A1620; border:1px solid #7A1620; }
+
+  .matrix-caption{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; font-size:11.5px; color:var(--navy); margin:26px 0 8px; }
+  .matrix-sub{ font-size:12px; color:#666; margin-bottom:10px; line-height:1.5; }
+  table.dash-matrix{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.dash-matrix th{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:10.5px; text-transform:uppercase; text-align:left; color:#fff; background:var(--navy); padding:8px 9px; }
+  td.wert-lbl{ font-weight:700; color:var(--navy); background:#fff; padding:9px; border-bottom:1px solid var(--hair); font-size:12.5px; }
+  td.cell-mark{ padding:0; border-bottom:1px solid var(--hair); border-left:1px solid var(--hair); text-align:center; background:#fff; }
+  .cell-inner{ padding:12px 6px; font-size:20px; }
+  .matrix-footnote{ font-size:10.5px; color:#666; margin-top:8px; line-height:1.5; }
+
+  .pick-card{ background:#fff; border-left:5px solid var(--teal); padding:16px 18px; margin-top:14px; }
+  .pick-card.gap{ border-left-color:var(--stone); }
+  .pick-eyebrow{ font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:0.04em; text-transform:uppercase; font-size:10.5px; color:#888; }
+  .pick-row{ display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+  .pick-row > div{ flex:1; min-width:220px; }
+  .pick-fieldlabel{ font-size:11px; color:#666; font-family:'Barlow Condensed',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px; }
+
+  .stolz-recap{ background:#fff; border-left:5px solid var(--amber); padding:12px 16px; margin-top:10px; }
+  .stolz-recap .sr-wert{ font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; font-size:11px; color:var(--navy); letter-spacing:0.03em; }
+  .stolz-recap .sr-text{ font-size:13px; margin-top:3px; color:#333; }
+
+  .recap-item{ background:#fff; border:1.4px solid var(--hair); padding:12px 14px; margin-top:10px; text-align:left; }
+  .rc-cell{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:11.5px; color:var(--navy); text-transform:uppercase; letter-spacing:0.02em; }
+  .rc-action{ font-size:13px; margin-top:4px; color:#333; }
+
+  .checkin-box{ background:#F2F0E8; border:1.4px solid var(--hair); padding:16px 18px; margin-top:22px; text-align:left; }
+  .checkin-title{ font-family:'Anton',sans-serif; font-size:14px; text-transform:uppercase; color:var(--navy); }
+  .checkin-text{ font-size:12.5px; color:#555; margin-top:6px; line-height:1.5; }
+  .checkin-q{ font-size:12.5px; color:#333; margin-top:8px; padding-left:14px; position:relative; }
+  .checkin-q::before{ content:"—"; position:absolute; left:0; color:var(--teal); }
+
+  @media print{
+    body{ background:#fff; padding:0; }
+    .page{ box-shadow:none; max-width:100%; }
+    .nav-row, .nav-btn{ display:none !important; }
+  }
+  @media (max-width:640px){
+    .page{ padding:26px 18px 24px; }
+    h1{ font-size:28px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">MindnessConsult · Werte-Check · United Pieces — Ravensburger</div>
+  <h1>Every Piece Matters</h1>
+  <div id="surveyView"></div>
+</div>
+
+<script>
+const WERTE = [
+  {
+    key: "Respect",
+    quote: "Wir behandeln einander mit Wertschätzung, Aufmerksamkeit und Respekt.",
+    anchor: "Euer Bild dafür vom Final Board: <b>Papaya!</b> — direkte, wertschätzende und aufmerksame Zusammenarbeit.",
+    fields: [
+      { label: "Im Alltag", question: "Schenke ich anderen im Arbeitsalltag echte Aufmerksamkeit — indem ich zuhöre, ausreden lasse und ihre Perspektive ernst nehme?" },
+      { label: "Wenn es schwierig wird", question: "Bleibe ich auch bei unterschiedlichen Meinungen, Fehlern oder unter Zeitdruck respektvoll in meinem Ton und Verhalten?" }
+    ]
+  },
+  {
+    key: "Fun",
+    quote: "Wir schaffen positive Energie, Humor und Freude in der Zusammenarbeit.",
+    anchor: "Euer eigenes Ritual dafür: bewusst <b>fünf Minuten eines Meetings zum informellen Austausch nutzen</b>.",
+    fields: [
+      { label: "Im Alltag", question: "Trage ich aktiv zu einer positiven Arbeitsatmosphäre bei — zum Beispiel durch Anerkennung, Offenheit, Humor oder echtes Interesse an anderen?" },
+      { label: "Wenn es schwierig wird", question: "Trage ich auch in anspruchsvollen Phasen zu einer konstruktiven und menschlichen Atmosphäre bei, ohne Schwierigkeiten kleinzureden?" }
+    ]
+  },
+  {
+    key: "Trust & Empowerment",
+    quote: "Wir vertrauen einander, delegieren Verantwortung und ermöglichen eigenständiges Handeln.",
+    anchor: "Euer Bild dafür vom Final Board: <b>Apple &amp; Onion</b> — sichtbar durch gegenseitige Unterstützung, Offenheit und das Bewusstsein für Stärken und Lücken.",
+    fields: [
+      { label: "Vertrauen geben", question: "Vertraue ich auf die Fähigkeiten und die Expertise anderer und gebe ihnen den notwendigen Handlungsspielraum?" },
+      { label: "Verantwortung übernehmen", question: "Übernehme ich selbst Verantwortung und handle eigenständig, anstatt auf Aufforderungen zu warten oder Verantwortung weiterzugeben?" }
+    ]
+  },
+  {
+    key: "Team Orientation",
+    quote: "Wir denken und handeln für unseren gemeinsamen Erfolg.",
+    anchor: "Aus dem Workshop: Ziele werden <b>in klare, erreichbare Schritte übersetzt</b>, damit gemeinsamer Erfolg konkret wird.",
+    fields: [
+      { label: "Über den eigenen Bereich hinaus", question: "Unterstütze ich andere aktiv und denke bei meinem Handeln auch an die Auswirkungen auf andere Teams und Bereiche?" },
+      { label: "Gemeinsamer Erfolg", question: "Stelle ich bei Entscheidungen und unterschiedlichen Interessen den gemeinsamen Erfolg über die Optimierung meines eigenen Bereichs?" }
+    ]
+  },
+  {
+    key: "Open-mindedness",
+    quote: "Wir bleiben offen für neue Perspektiven, Ideen und Lernmöglichkeiten.",
+    anchor: "Passend dazu eure Erkenntnis vom Workshop: Energie und Engagement entstehen auch durch <b>regelmäßige Selbstreflexion</b> — genau das ist dieser Check.",
+    fields: [
+      { label: "Andere Perspektiven", question: "Höre ich mir andere Ideen und Perspektiven offen an — auch wenn sie meiner eigenen Meinung widersprechen?" },
+      { label: "Feedback und Lernen", question: "Nutze ich Feedback, Fehler und unerwartete Situationen als Gelegenheit, mein eigenes Denken oder Handeln zu überprüfen?" }
+    ]
+  }
+];
+
+const PAGES = ["intro", ...WERTE.map(w => w.key), "transfer", "results", "done"];
+const SURVEY_PAGES = WERTE.map(w => w.key).concat(["transfer"]);
+
+let pageIdx = 0;
+let team = "";
+let answers = {};      // "werte::<Wert>::<fieldIdx>" -> 'green'|'amber'|'white'   |   "regel::<idx>" -> ...
+let stolzTexts = {};
+let transferHelpful = "";
+let transferReturn = "";
+let proudBehavior = "";
+let onePercent = "";
+let visibleContribution = "";
+
+function triRow(key, opts){
+  // opts: [{val:'green',icon:'🟢',label:'zeigt sich deutlich'}, ...]
+  const sel = answers[key];
+  const btns = opts.map(o => `
+    <div class="tri-btn ${sel===o.val ? 'sel-'+o.val : ''}" data-key="${key}" data-val="${o.val}">
+      <div class="tb-ico">${o.icon}</div>
+      <span class="tb-txt">${o.label}</span>
+    </div>`).join('');
+  return `<div class="tri-row">${btns}</div>`;
+}
+
+const WERTE_OPTS = [
+  { val:'green', icon:'🟢', label:'gelingt mir bereits gut' },
+  { val:'amber', icon:'🟡', label:'möchte ich bewusster beachten' },
+  { val:'white', icon:'⚪', label:'hier kann ich stärker beitragen' }
+];
+
+function render(){
+  const key = PAGES[pageIdx];
+  if(key === 'intro') return renderIntro();
+  if(key === 'transfer') return renderTransfer();
+  if(key === 'results') return renderResults();
+  if(key === 'done') return renderDone();
+  const wIdx = WERTE.findIndex(w => w.key === key);
+  if(wIdx >= 0) return renderWert(wIdx);
+}
+
+function progressHtml(){
+  const idx = SURVEY_PAGES.indexOf(PAGES[pageIdx]);
+  if(idx < 0) return '';
+  const pct = Math.round(((idx+1) / SURVEY_PAGES.length) * 100);
+  return `
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;"></div></div>
+      <div class="progress-lbl">Schritt ${idx+1} von ${SURVEY_PAGES.length}</div>
+    </div>`;
+}
+
+function renderIntro(){
+  const view = document.getElementById('surveyView');
+  view.innerHTML = `
+    <div class="card">
+      <h2 class="section-h">Mein Beitrag zu unserer Kultur</h2>
+      <div class="intro">
+        <p>Unsere Werte werden nicht allein durch Worte lebendig, sondern durch das, was wir täglich tun: in Begegnungen, Entscheidungen, Übergaben, Meetings und besonders dann, wenn es schwierig wird.</p>
+        <p>Dieser kurze Check lädt dich ein, deinen eigenen Beitrag zu betrachten: <b>Was gelingt dir bereits? Worauf bist du stolz? Was möchtest du künftig noch bewusster zeigen?</b></p>
+        <p>Es geht nicht um richtig oder falsch und nicht um die Bewertung anderer. Es geht um deinen persönlichen Beitrag dazu, dass <b>Respect, Fun, Trust &amp; Empowerment, Team Orientation und Open-mindedness</b> für andere spürbar werden.</p>
+        <p>🟢 gelingt mir bereits gut · 🟡 möchte ich bewusster beachten · ⚪ hier kann ich stärker beitragen. Rechne mit etwa 7–10 Minuten.</p>
+      </div>
+      <div class="team-input">
+        <label for="teamField">Team (optional)</label>
+        <input type="text" id="teamField" placeholder="z. B. Marketing" value="${team}">
+      </div>
+      <div class="nav-row">
+        <div></div>
+        <div class="nav-btn primary" id="btnStart">Los geht's</div>
+      </div>
+    </div>`;
+  document.getElementById('teamField').oninput = (e) => { team = e.target.value; };
+  document.getElementById('btnStart').onclick = () => { pageIdx++; render(); };
+}
+
+function renderWert(wIdx){
+  const w = WERTE[wIdx];
+  const view = document.getElementById('surveyView');
+  const fieldsHtml = w.fields.map((f, fi) => {
+    const key = `werte::${w.key}::${fi}`;
+    return `
+      <div class="field-group">
+        <div class="field-label">${f.label}</div>
+        <div class="field-question">${f.question}</div>
+        ${triRow(key, WERTE_OPTS)}
+      </div>`;
+  }).join('');
+
+  view.innerHTML = `
+    <div class="card">
+      <h2 class="section-h">${wIdx+1}. ${w.key}</h2>
+      <div class="value-quote">„${w.quote}"</div>
+      <div class="value-anchor">${w.anchor}</div>
+      ${fieldsHtml}
+      <div class="stolz-box">
+        <div class="stolz-label">Mein Kulturmoment</div>
+        <div class="stolz-sub">Wann war dieser Wert durch mein Verhalten in den vergangenen Wochen für andere konkret spürbar? Freiwillig.</div>
+        <textarea class="tarea" id="stolzArea" placeholder="z. B. In dieser Situation habe ich ...">${stolzTexts[w.key] || ''}</textarea>
+      </div>
+      ${progressHtml()}
+      <div class="nav-row">
+        <div class="nav-btn" id="btnBack">Zurück</div>
+        <div class="nav-btn primary" id="btnNext">Weiter</div>
+      </div>
+    </div>`;
+
+  bindTriButtons();
+  document.getElementById('stolzArea').oninput = (e) => { stolzTexts[w.key] = e.target.value; };
+  document.getElementById('btnBack').onclick = () => { pageIdx--; render(); };
+  document.getElementById('btnNext').onclick = () => { pageIdx++; render(); };
+}
+
+function renderTransfer(){
+  const view = document.getElementById('surveyView');
+  view.innerHTML = `
+    <div class="card">
+      <h2 class="section-h">Impulse aus dem Workshop</h2>
+      <div class="intro">Welche Vereinbarungen, Rituale oder Begriffe helfen dir dabei, unsere Werte im Alltag bewusster zu leben? Denk zum Beispiel an direktes Feedback, fünf Minuten informellen Austausch, Good News oder eure Team-Sprache wie „Gelato", „I need a peach" und „Lollipop Amélie".</div>
+      <div class="stolz-box">
+        <div class="stolz-label">Das hilft mir bereits</div>
+        <textarea class="tarea" id="transferHelpful" placeholder="Welche Vereinbarung oder welcher Impuls unterstützt dich?">${transferHelpful}</textarea>
+      </div>
+      <div class="stolz-box">
+        <div class="stolz-label">Das möchte ich wieder stärker nutzen</div>
+        <textarea class="tarea" id="transferReturn" placeholder="Was möchtest du wieder bewusster in deinen Alltag holen?">${transferReturn}</textarea>
+      </div>
+      ${progressHtml()}
+      <div class="nav-row">
+        <div class="nav-btn" id="btnBack">Zurück</div>
+        <div class="nav-btn primary" id="btnNext">Weiter zu meinem Ergebnis</div>
+      </div>
+    </div>`;
+  document.getElementById('transferHelpful').oninput = e => { transferHelpful = e.target.value; };
+  document.getElementById('transferReturn').oninput = e => { transferReturn = e.target.value; };
+  document.getElementById('btnBack').onclick = () => { pageIdx--; render(); };
+  document.getElementById('btnNext').onclick = () => { pageIdx++; render(); };
+}
+
+function bindTriButtons(){
+  document.querySelectorAll('.tri-btn[data-key]').forEach(btn => {
+    btn.onclick = () => {
+      answers[btn.dataset.key] = btn.dataset.val;
+      render();
+    };
+  });
+}
+
+const MARK_ICON = { green:'🟢', amber:'🟡', white:'⚪', undefined:'—' };
+
+function renderResults(){
+  const view = document.getElementById('surveyView');
+
+  const matrixRows = WERTE.map(w => {
+    const cells = w.fields.map((f, fi) => {
+      const v = answers[`werte::${w.key}::${fi}`];
+      return `<td class="cell-mark"><div class="cell-inner">${MARK_ICON[v]}</div></td>`;
+    }).join('');
+    return `<tr><td class="wert-lbl">${w.key}</td>${cells}</tr>`;
+  }).join('');
+
+  const stolzAlle = WERTE.map(w => w.key)
+    .filter(k => (stolzTexts[k] || '').trim().length > 0)
+    .map(k => `
+      <div class="stolz-recap">
+        <div class="sr-wert">${k}</div>
+        <div class="sr-text">${stolzTexts[k]}</div>
+      </div>`).join('');
+  const stolzSection = stolzAlle ? stolzAlle : `<div class="matrix-sub">Noch keine Stolz-Beispiele eingetragen — geh gern zurück und ergänze sie, das ist deine Grundlage für "Das gelingt mir schon besonders gut".</div>`;
+
+  view.innerHTML = `
+    <div class="card">
+      <h2 class="section-h">Mein persönlicher Blick</h2>
+      <div class="intro" style="max-width:100%;">Deine Antworten zeigen, wo du unsere Werte bereits durch dein Verhalten spürbar machst und worauf du künftig bewusster achten möchtest. Keine Berechnung und kein Vergleich mit anderen.</div>
+
+      <div class="matrix-caption">Meine Werte-Übersicht</div>
+      <table class="dash-matrix">
+        <thead><tr><th>Wert</th><th>Perspektive 1</th><th>Perspektive 2</th></tr></thead>
+        <tbody>${matrixRows}</tbody>
+      </table>
+      <div class="matrix-footnote">🟢 gelingt mir bereits gut · 🟡 möchte ich bewusster beachten · ⚪ hier kann ich stärker beitragen · — nicht beantwortet</div>
+
+      <div class="matrix-caption">Das gelingt mir schon besonders gut — meine Stolz-Momente</div>
+      <div class="matrix-sub">Automatisch aus deinen „Hierauf bin ich stolz"-Notizen oben zusammengestellt — das sind deine Stärken, mit dem eigenen Beispiel als Beleg.</div>
+      ${stolzSection}
+
+      <div class="matrix-caption">Das gelingt mir bereits</div>
+      <div class="matrix-sub">Auf welches Verhalten bist du besonders stolz, weil es eure gemeinsame Kultur stärkt?</div>
+      <textarea class="tarea" id="proudBehavior" placeholder="Darauf bin ich besonders stolz ...">${proudBehavior}</textarea>
+
+      <div class="matrix-caption">Mein persönlicher 1%-Beitrag</div>
+      <div class="matrix-sub">Welches eine Verhalten möchtest du in den nächsten Tagen bewusster zeigen, damit einer eurer Werte für andere noch stärker spürbar wird?</div>
+      <textarea class="tarea" id="onePercent" placeholder="Mein kleiner, konkreter Beitrag ...">${onePercent}</textarea>
+
+      <div class="matrix-caption">Every Piece Matters</div>
+      <div class="matrix-sub">Woran könnten andere konkret erkennen, dass du deinen Teil zu eurer gemeinsamen Kultur beiträgst?</div>
+      <textarea class="tarea" id="visibleContribution" placeholder="Andere können meinen Beitrag daran erkennen, dass ...">${visibleContribution}</textarea>
+
+      <div id="resultsBanner"></div>
+      <div class="nav-row">
+        <div class="nav-btn" id="btnBack">Zurück</div>
+        <div class="nav-btn" id="btnPrint">Als PDF speichern / drucken</div>
+        <div class="nav-btn primary" id="btnFinish">Abschließen &amp; als Datei herunterladen</div>
+      </div>
+    </div>`;
+
+  document.getElementById('proudBehavior').oninput = e => { proudBehavior = e.target.value; };
+  document.getElementById('onePercent').oninput = e => { onePercent = e.target.value; };
+  document.getElementById('visibleContribution').oninput = e => { visibleContribution = e.target.value; };
+
+  document.getElementById('btnBack').onclick = () => { pageIdx--; render(); };
+  document.getElementById('btnPrint').onclick = () => { window.print(); };
+  document.getElementById('btnFinish').onclick = () => { finishAndExport(); };
+}
+
+function buildPayload(){
+  return {
+    tool: "Werte-Check nach dem Workshop — Selbstreflexion (leicht)",
+    version: "Teilnehmerversion United Pieces / Ravensburger 2.0",
+    team: team || null,
+    ts: Date.now(),
+    werte_uebersicht: WERTE.map(w => ({
+      wert: w.key,
+      felder: w.fields.map((f, fi) => ({ feld: f.label, einschaetzung: answers[`werte::${w.key}::${fi}`] || null }))
+    })),
+    workshop_impulse: { hilft_bereits: transferHelpful || null, wieder_staerker_nutzen: transferReturn || null },
+    persoenliche_reflexion: { darauf_bin_ich_stolz: proudBehavior || null, ein_prozent_beitrag: onePercent || null, daran_erkennen_andere_meinen_beitrag: visibleContribution || null },
+    kulturmomente: WERTE.map(w => w.key)
+      .filter(k => (stolzTexts[k] || '').trim().length > 0)
+      .map(k => ({ bereich: k, text: stolzTexts[k] }))
+  };
+}
+
+function finishAndExport(){
+  const banner = document.getElementById('resultsBanner');
+  try{
+    const payload = buildPayload();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date(payload.ts).toISOString().slice(0,16).replace(/[:T]/g,'-');
+    a.href = url;
+    a.download = `werte-check_united-pieces_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    pageIdx = PAGES.indexOf('done');
+    render();
+  } catch(err){
+    banner.innerHTML = `<div class="banner err">Fehler beim Erstellen der Ergebnisdatei: ${err.message || err}. Bitte erneut versuchen oder stattdessen "Als PDF speichern/drucken" nutzen.</div>`;
+  }
+}
+
+function renderDone(){
+  const view = document.getElementById('surveyView');
+  view.innerHTML = `
+    <div class="card thanks">
+      <h2>Danke!</h2>
+      <p>Deine persönliche Reflexion wurde als Datei auf deinem Gerät heruntergeladen. Du entscheidest selbst, ob und mit wem du sie teilst.</p>
+      <div class="recap-item">
+        <div class="rc-cell">Mein persönlicher 1%-Beitrag</div>
+        <div class="rc-action">${onePercent || 'Kein Beitrag eingetragen.'}</div>
+      </div>
+
+      <div class="checkin-box">
+        <div class="checkin-title">Every Piece Matters</div>
+        <div class="checkin-text">Werte werden zur Kultur, wenn andere sie in unserem Verhalten erleben. Nimm deinen 1%-Beitrag mit in den Alltag.</div>
+        <div class="checkin-q">Wann kann ich dieses Verhalten als Nächstes konkret zeigen?</div>
+        <div class="checkin-q">Wer könnte meinen Beitrag unmittelbar erleben?</div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; gap:10px; justify-content:center;">
+        <div class="nav-btn" id="btnPrintDone">Als PDF speichern / drucken</div>
+        <div class="nav-btn primary" id="btnAnother">Weitere Teilnahme erfassen</div>
+      </div>
+    </div>`;
+  document.getElementById('btnPrintDone').onclick = () => { window.print(); };
+  document.getElementById('btnAnother').onclick = () => {
+    team=''; answers={}; stolzTexts={}; transferHelpful=''; transferReturn='';
+    proudBehavior=''; onePercent=''; visibleContribution='';
+    pageIdx = 0; render();
+  };
+}
+
+render();
+</script>
+</body>
+</html>
